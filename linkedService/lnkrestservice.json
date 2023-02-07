@@ -1,0 +1,19 @@
+{
+	"name": "lnkrestservice",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://management.azure.com//subscriptions/22ff28db-31a0-4d57-9584-8aa2214aed73/providers/Microsoft.Consumption/usageDetails?api-version=2021-10-01",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous",
+			"authHeaders": {
+				"Authorization": {
+					"type": "SecureString",
+					"value": "**********"
+				}
+			}
+		}
+	}
+}

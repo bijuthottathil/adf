@@ -1,0 +1,21 @@
+{
+	"name": "dsjsonrawsoniso",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "mynew.json",
+				"container": "input"
+			},
+			"encodingName": "ISO-8859-1"
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,55 @@
+{
+	"name": "dataflowflattenjsonfile",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "dataflowdsjsoninput",
+						"type": "DatasetReference"
+					},
+					"name": "srcjsoninput"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "dscsvoutput",
+						"type": "DatasetReference"
+					},
+					"name": "writetocsvfile"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flattenjsonformat"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          value as (id as string, kind as string, name as string, properties as (additionalInfo as string, benefitId as string, benefitName as string, billingAccountId as string, billingAccountName as string, billingCurrencyCode as string, billingPeriodEndDate as timestamp, billingPeriodStartDate as timestamp, billingProfileId as string, billingProfileName as string, chargeType as string, consumedService as string, costAllocationRuleName as string, costCenter as string, costInBillingCurrency as double, costInPricingCurrency as double, costInUSD as double, customerName as string, customerTenantId as string, date as timestamp, effectivePrice as double, exchangeRate as boolean, exchangeRateDate as timestamp, exchangeRatePricingToBilling as boolean, frequency as string, instanceName as string, invoiceId as string, invoiceSectionId as string, invoiceSectionName as string, isAzureCreditEligible as boolean, meterCategory as string, meterId as string, meterName as string, meterRegion as string, meterSubCategory as string, partnerEarnedCreditApplied as boolean, partnerEarnedCreditRate as boolean, partnerName as string, partnerTenantId as string, payGPrice as double, paygCostInBillingCurrency as double, paygCostInUSD as double, previousInvoiceId as string, pricingCurrencyCode as string, pricingModel as string, product as string, productIdentifier as string, productOrderId as string, productOrderName as string, provider as string, publisherId as string, publisherName as string, publisherType as string, quantity as double, resellerMpnId as string, resellerName as string, reservationId as string, reservationName as string, resourceGroup as string, resourceLocation as string, resourceLocationNormalized as string, serviceFamily as string, serviceInfo1 as string, serviceInfo2 as string, servicePeriodEndDate as timestamp, servicePeriodStartDate as timestamp, subscriptionGuid as string, subscriptionName as string, term as string, unitOfMeasure as string, unitPrice as double), tags as string, type as string)[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments') ~> srcjsoninput",
+				"srcjsoninput foldDown(unroll(value, value),",
+				"     mapColumn(",
+				"          Value = value.kind,",
+				"          {Resource Group} = value.properties.resourceGroup,",
+				"          ResourceLocation = value.properties.resourceLocation,",
+				"          Product = value.properties.product,",
+				"          unitPrice = value.properties.unitPrice,",
+				"          paygCostInUSD = value.properties.paygCostInUSD",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenjsonformat",
+				"flattenjsonformat sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> writetocsvfile"
+			]
+		}
+	}
+}

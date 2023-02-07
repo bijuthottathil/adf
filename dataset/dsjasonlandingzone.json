@@ -1,0 +1,266 @@
+{
+	"name": "dsjasonlandingzone",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "mynew.json",
+				"container": "input"
+			},
+			"encodingName": "UTF-8 without BOM"
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"value": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"kind": {
+								"type": "string"
+							},
+							"id": {
+								"type": "string"
+							},
+							"name": {
+								"type": "string"
+							},
+							"type": {
+								"type": "string"
+							},
+							"tags": {
+								"type": "null"
+							},
+							"properties": {
+								"type": "object",
+								"properties": {
+									"additionalInfo": {
+										"type": "string"
+									},
+									"billingAccountId": {
+										"type": "string"
+									},
+									"billingAccountName": {
+										"type": "string"
+									},
+									"billingCurrencyCode": {
+										"type": "string"
+									},
+									"billingPeriodEndDate": {
+										"type": "string"
+									},
+									"billingPeriodStartDate": {
+										"type": "string"
+									},
+									"billingProfileId": {
+										"type": "string"
+									},
+									"billingProfileName": {
+										"type": "string"
+									},
+									"chargeType": {
+										"type": "string"
+									},
+									"consumedService": {
+										"type": "string"
+									},
+									"costInBillingCurrency": {
+										"type": "integer"
+									},
+									"costInPricingCurrency": {
+										"type": "integer"
+									},
+									"costCenter": {
+										"type": "string"
+									},
+									"date": {
+										"type": "string"
+									},
+									"exchangeRate": {
+										"type": "string"
+									},
+									"exchangeRateDate": {
+										"type": "string"
+									},
+									"instanceName": {
+										"type": "string"
+									},
+									"invoiceId": {
+										"type": "string"
+									},
+									"invoiceSectionId": {
+										"type": "string"
+									},
+									"invoiceSectionName": {
+										"type": "string"
+									},
+									"isAzureCreditEligible": {
+										"type": "boolean"
+									},
+									"meterCategory": {
+										"type": "string"
+									},
+									"meterId": {
+										"type": "string"
+									},
+									"meterName": {
+										"type": "string"
+									},
+									"meterRegion": {
+										"type": "string"
+									},
+									"meterSubCategory": {
+										"type": "string"
+									},
+									"previousInvoiceId": {
+										"type": "string"
+									},
+									"pricingCurrencyCode": {
+										"type": "string"
+									},
+									"product": {
+										"type": "string"
+									},
+									"productIdentifier": {
+										"type": "string"
+									},
+									"productOrderId": {
+										"type": "string"
+									},
+									"productOrderName": {
+										"type": "string"
+									},
+									"publisherName": {
+										"type": "string"
+									},
+									"publisherType": {
+										"type": "string"
+									},
+									"quantity": {
+										"type": "number"
+									},
+									"resourceGroup": {
+										"type": "string"
+									},
+									"resourceLocation": {
+										"type": "string"
+									},
+									"resourceLocationNormalized": {
+										"type": "string"
+									},
+									"serviceFamily": {
+										"type": "string"
+									},
+									"serviceInfo1": {
+										"type": "string"
+									},
+									"serviceInfo2": {
+										"type": "string"
+									},
+									"servicePeriodEndDate": {
+										"type": "string"
+									},
+									"servicePeriodStartDate": {
+										"type": "string"
+									},
+									"subscriptionGuid": {
+										"type": "string"
+									},
+									"subscriptionName": {
+										"type": "string"
+									},
+									"unitOfMeasure": {
+										"type": "string"
+									},
+									"unitPrice": {
+										"type": "number"
+									},
+									"customerTenantId": {
+										"type": "string"
+									},
+									"customerName": {
+										"type": "string"
+									},
+									"partnerTenantId": {
+										"type": "string"
+									},
+									"partnerName": {
+										"type": "string"
+									},
+									"resellerMpnId": {
+										"type": "string"
+									},
+									"resellerName": {
+										"type": "string"
+									},
+									"publisherId": {
+										"type": "string"
+									},
+									"reservationId": {
+										"type": "string"
+									},
+									"reservationName": {
+										"type": "string"
+									},
+									"frequency": {
+										"type": "string"
+									},
+									"term": {
+										"type": "string"
+									},
+									"payGPrice": {
+										"type": "number"
+									},
+									"costInUSD": {
+										"type": "integer"
+									},
+									"paygCostInBillingCurrency": {
+										"type": "number"
+									},
+									"paygCostInUSD": {
+										"type": "number"
+									},
+									"exchangeRatePricingToBilling": {
+										"type": "integer"
+									},
+									"partnerEarnedCreditRate": {
+										"type": "integer"
+									},
+									"partnerEarnedCreditApplied": {
+										"type": "string"
+									},
+									"pricingModel": {
+										"type": "string"
+									},
+									"effectivePrice": {
+										"type": "integer"
+									},
+									"costAllocationRuleName": {
+										"type": "string"
+									},
+									"provider": {
+										"type": "string"
+									},
+									"benefitId": {
+										"type": "string"
+									},
+									"benefitName": {
+										"type": "string"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

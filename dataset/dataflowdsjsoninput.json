@@ -1,0 +1,21 @@
+{
+	"name": "dataflowdsjsoninput",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "storage",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "myoutput.json",
+				"container": "dept"
+			},
+			"encodingName": "ISO-8859-1"
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,13 @@
+{
+	"name": "dsRestAPI",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "lnkrestservice",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
