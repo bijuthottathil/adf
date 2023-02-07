@@ -1,0 +1,24 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "mynewdatafactorybiju"
+		},
+		"bloboutputstorage_connectionString": {
+			"value": ""
+		},
+		"storage_connectionString": {
+			"value": ""
+		},
+		"lnkrestservice_properties_typeProperties_url": {
+			"value": "https://management.azure.com//subscriptions/22ff28db-31a0-4d57-9584-8aa2214aed73/providers/Microsoft.Consumption/usageDetails?api-version=2021-10-01"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

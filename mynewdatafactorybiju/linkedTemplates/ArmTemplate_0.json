@@ -1,0 +1,755 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "mynewdatafactorybiju"
+		},
+		"bloboutputstorage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'bloboutputstorage'"
+		},
+		"storage_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'storage'"
+		},
+		"lnkrestservice_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://management.azure.com//subscriptions/22ff28db-31a0-4d57-9584-8aa2214aed73/providers/Microsoft.Consumption/usageDetails?api-version=2021-10-01"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/bloboutputstorage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('bloboutputstorage_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/lnkrestservice')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('lnkrestservice_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous",
+					"authHeaders": {
+						"Authorization": {
+							"type": "SecureString",
+							"value": "**********"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/storage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('storage_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflowdsjsoninput')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "myoutput.json",
+						"container": "dept"
+					},
+					"encodingName": "ISO-8859-1"
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsRestAPI')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "lnkrestservice",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/lnkrestservice')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dscsvoutput')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "myoutput.csv",
+						"container": "dept"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsjasonlandingzone')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "mynew.json",
+						"container": "input"
+					},
+					"encodingName": "UTF-8 without BOM"
+				},
+				"schema": {
+					"type": "object",
+					"properties": {
+						"value": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"kind": {
+										"type": "string"
+									},
+									"id": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									},
+									"type": {
+										"type": "string"
+									},
+									"tags": {
+										"type": "null"
+									},
+									"properties": {
+										"type": "object",
+										"properties": {
+											"additionalInfo": {
+												"type": "string"
+											},
+											"billingAccountId": {
+												"type": "string"
+											},
+											"billingAccountName": {
+												"type": "string"
+											},
+											"billingCurrencyCode": {
+												"type": "string"
+											},
+											"billingPeriodEndDate": {
+												"type": "string"
+											},
+											"billingPeriodStartDate": {
+												"type": "string"
+											},
+											"billingProfileId": {
+												"type": "string"
+											},
+											"billingProfileName": {
+												"type": "string"
+											},
+											"chargeType": {
+												"type": "string"
+											},
+											"consumedService": {
+												"type": "string"
+											},
+											"costInBillingCurrency": {
+												"type": "integer"
+											},
+											"costInPricingCurrency": {
+												"type": "integer"
+											},
+											"costCenter": {
+												"type": "string"
+											},
+											"date": {
+												"type": "string"
+											},
+											"exchangeRate": {
+												"type": "string"
+											},
+											"exchangeRateDate": {
+												"type": "string"
+											},
+											"instanceName": {
+												"type": "string"
+											},
+											"invoiceId": {
+												"type": "string"
+											},
+											"invoiceSectionId": {
+												"type": "string"
+											},
+											"invoiceSectionName": {
+												"type": "string"
+											},
+											"isAzureCreditEligible": {
+												"type": "boolean"
+											},
+											"meterCategory": {
+												"type": "string"
+											},
+											"meterId": {
+												"type": "string"
+											},
+											"meterName": {
+												"type": "string"
+											},
+											"meterRegion": {
+												"type": "string"
+											},
+											"meterSubCategory": {
+												"type": "string"
+											},
+											"previousInvoiceId": {
+												"type": "string"
+											},
+											"pricingCurrencyCode": {
+												"type": "string"
+											},
+											"product": {
+												"type": "string"
+											},
+											"productIdentifier": {
+												"type": "string"
+											},
+											"productOrderId": {
+												"type": "string"
+											},
+											"productOrderName": {
+												"type": "string"
+											},
+											"publisherName": {
+												"type": "string"
+											},
+											"publisherType": {
+												"type": "string"
+											},
+											"quantity": {
+												"type": "number"
+											},
+											"resourceGroup": {
+												"type": "string"
+											},
+											"resourceLocation": {
+												"type": "string"
+											},
+											"resourceLocationNormalized": {
+												"type": "string"
+											},
+											"serviceFamily": {
+												"type": "string"
+											},
+											"serviceInfo1": {
+												"type": "string"
+											},
+											"serviceInfo2": {
+												"type": "string"
+											},
+											"servicePeriodEndDate": {
+												"type": "string"
+											},
+											"servicePeriodStartDate": {
+												"type": "string"
+											},
+											"subscriptionGuid": {
+												"type": "string"
+											},
+											"subscriptionName": {
+												"type": "string"
+											},
+											"unitOfMeasure": {
+												"type": "string"
+											},
+											"unitPrice": {
+												"type": "number"
+											},
+											"customerTenantId": {
+												"type": "string"
+											},
+											"customerName": {
+												"type": "string"
+											},
+											"partnerTenantId": {
+												"type": "string"
+											},
+											"partnerName": {
+												"type": "string"
+											},
+											"resellerMpnId": {
+												"type": "string"
+											},
+											"resellerName": {
+												"type": "string"
+											},
+											"publisherId": {
+												"type": "string"
+											},
+											"reservationId": {
+												"type": "string"
+											},
+											"reservationName": {
+												"type": "string"
+											},
+											"frequency": {
+												"type": "string"
+											},
+											"term": {
+												"type": "string"
+											},
+											"payGPrice": {
+												"type": "number"
+											},
+											"costInUSD": {
+												"type": "integer"
+											},
+											"paygCostInBillingCurrency": {
+												"type": "number"
+											},
+											"paygCostInUSD": {
+												"type": "number"
+											},
+											"exchangeRatePricingToBilling": {
+												"type": "integer"
+											},
+											"partnerEarnedCreditRate": {
+												"type": "integer"
+											},
+											"partnerEarnedCreditApplied": {
+												"type": "string"
+											},
+											"pricingModel": {
+												"type": "string"
+											},
+											"effectivePrice": {
+												"type": "integer"
+											},
+											"costAllocationRuleName": {
+												"type": "string"
+											},
+											"provider": {
+												"type": "string"
+											},
+											"benefitId": {
+												"type": "string"
+											},
+											"benefitName": {
+												"type": "string"
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsjsonrawsoniso')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "storage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "mynew.json",
+						"container": "input"
+					},
+					"encodingName": "ISO-8859-1"
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dsjsonrawzoneoutput')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "bloboutputstorage",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "myoutput.json",
+						"container": "dept"
+					},
+					"encodingName": "UTF-8 without BOM"
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/bloboutputstorage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflowflattenjsonfile')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "dataflowdsjsoninput",
+								"type": "DatasetReference"
+							},
+							"name": "srcjsoninput"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "dscsvoutput",
+								"type": "DatasetReference"
+							},
+							"name": "writetocsvfile"
+						}
+					],
+					"transformations": [
+						{
+							"name": "flattenjsonformat"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          value as (id as string, kind as string, name as string, properties as (additionalInfo as string, benefitId as string, benefitName as string, billingAccountId as string, billingAccountName as string, billingCurrencyCode as string, billingPeriodEndDate as timestamp, billingPeriodStartDate as timestamp, billingProfileId as string, billingProfileName as string, chargeType as string, consumedService as string, costAllocationRuleName as string, costCenter as string, costInBillingCurrency as double, costInPricingCurrency as double, costInUSD as double, customerName as string, customerTenantId as string, date as timestamp, effectivePrice as double, exchangeRate as boolean, exchangeRateDate as timestamp, exchangeRatePricingToBilling as boolean, frequency as string, instanceName as string, invoiceId as string, invoiceSectionId as string, invoiceSectionName as string, isAzureCreditEligible as boolean, meterCategory as string, meterId as string, meterName as string, meterRegion as string, meterSubCategory as string, partnerEarnedCreditApplied as boolean, partnerEarnedCreditRate as boolean, partnerName as string, partnerTenantId as string, payGPrice as double, paygCostInBillingCurrency as double, paygCostInUSD as double, previousInvoiceId as string, pricingCurrencyCode as string, pricingModel as string, product as string, productIdentifier as string, productOrderId as string, productOrderName as string, provider as string, publisherId as string, publisherName as string, publisherType as string, quantity as double, resellerMpnId as string, resellerName as string, reservationId as string, reservationName as string, resourceGroup as string, resourceLocation as string, resourceLocationNormalized as string, serviceFamily as string, serviceInfo1 as string, serviceInfo2 as string, servicePeriodEndDate as timestamp, servicePeriodStartDate as timestamp, subscriptionGuid as string, subscriptionName as string, term as string, unitOfMeasure as string, unitPrice as double), tags as string, type as string)[]",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     documentForm: 'arrayOfDocuments') ~> srcjsoninput",
+						"srcjsoninput foldDown(unroll(value, value),",
+						"     mapColumn(",
+						"          Value = value.kind,",
+						"          {Resource Group} = value.properties.resourceGroup,",
+						"          ResourceLocation = value.properties.resourceLocation,",
+						"          Product = value.properties.product,",
+						"          unitPrice = value.properties.unitPrice,",
+						"          paygCostInUSD = value.properties.paygCostInUSD",
+						"     ),",
+						"     skipDuplicateMapInputs: false,",
+						"     skipDuplicateMapOutputs: false) ~> flattenjsonformat",
+						"flattenjsonformat sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> writetocsvfile"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dataflowdsjsoninput')]",
+				"[concat(variables('factoryId'), '/datasets/dscsvoutput')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflowpipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflowflattenjsonfile",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"srcjsoninput": {},
+									"writetocsvfile": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-06T21:53:46Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflowflattenjsonfile')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/apipipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy RestAPI Json to BLOB",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "dsRestAPI",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dsjasonlandingzone",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "copy RestAPI Json to BLOB",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 5
+						}
+					},
+					{
+						"name": "Landing to raw zone with ISO format json",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Wait1",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "JsonSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "JsonReadSettings"
+								}
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings"
+								}
+							},
+							"enableStaging": false
+						},
+						"inputs": [
+							{
+								"referenceName": "dsjsonrawsoniso",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "dsjsonrawzoneoutput",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Wait2",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "Landing to raw zone with ISO format json",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 10
+						}
+					},
+					{
+						"name": "Executedataflow",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "Wait2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "dataflowpipeline",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-02-06T22:14:07Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/dsRestAPI')]",
+				"[concat(variables('factoryId'), '/datasets/dsjasonlandingzone')]",
+				"[concat(variables('factoryId'), '/datasets/dsjsonrawsoniso')]",
+				"[concat(variables('factoryId'), '/datasets/dsjsonrawzoneoutput')]",
+				"[concat(variables('factoryId'), '/pipelines/dataflowpipeline')]"
+			]
+		}
+	]
+}
